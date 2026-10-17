@@ -7,6 +7,8 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 
 interface SiteStackProps extends cdk.StackProps {
   githubRepo: string; // "owner/repo"
+  // Newer GitHub repos use immutable OIDC subjects: "repo:owner@ID/repo@ID".
+  githubSubjectPrefix?: string;
 }
 
 export class SiteStack extends cdk.Stack {
@@ -53,7 +55,12 @@ function handler(event) {
     const deployRole = new iam.Role(this, 'DeployRole', {
       assumedBy: new iam.WebIdentityPrincipal(provider.openIdConnectProviderArn, {
         StringEquals: { 'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com' },
-        StringLike: { 'token.actions.githubusercontent.com:sub': `repo:${props.githubRepo}:ref:refs/heads/main` },
+        StringLike: {
+          'token.actions.githubusercontent.com:sub': [
+            `repo:${props.githubRepo}:ref:refs/heads/main`,
+            ...(props.githubSubjectPrefix ? [`${props.githubSubjectPrefix}:ref:refs/heads/main`] : []),
+          ],
+        },
       }),
     });
     bucket.grantReadWrite(deployRole);
