@@ -1,0 +1,17 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+const builds = (await getCollection('builds', (b) => !b.data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+<Base title="Builds · Josh Paper">
+  <h1>Builds</h1>
+  {builds.map((b) => (
+    <div class="card">
+      <h3><a href={`/builds/${b.id}/`}>{b.data.title}</a></h3>
+      <div class="meta">{b.data.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short' })} · {b.data.status}</div>
+      <p>{b.data.summary}</p>
+      {b.data.tags.map((t) => <span class="tag">{t}</span>)}
+    </div>
+  ))}
+</Base>

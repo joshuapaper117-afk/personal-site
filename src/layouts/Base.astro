@@ -1,0 +1,26 @@
+---
+import '../styles/global.css';
+interface Props { title: string; description?: string }
+const { title, description = 'Personal site: about me, my builds, and my CV.' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="/">Josh Paper</a>
+      <nav>
+        <a href="/#about">About</a>
+        <a href="/builds/">Builds</a>
+        <a href="/cv/">CV</a>
+      </nav>
+    </header>
+    <main><slot /></main>
+    <footer>© {new Date().getFullYear()} Josh Paper</footer>
+  </body>
+</html>

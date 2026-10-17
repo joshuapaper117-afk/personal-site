@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+const builds = (await getCollection('builds', (b) => !b.data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+---
+<Base title="Josh Paper">
+  <section id="about">
+    <h1>Hi, I'm Josh.</h1>
+    <p>
+      Casual about-me goes here: what you do, what you tinker with, what you're
+      into outside of work. Keep it human. The CV has the formal version.
+    </p>
+  </section>
+
+  <section>
+    <h2>Latest builds</h2>
+    {builds.map((b) => (
+      <div class="card">
+        <h3><a href={`/builds/${b.id}/`}>{b.data.title}</a></h3>
+        <div class="meta">{b.data.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short' })} · {b.data.status}</div>
+        <p>{b.data.summary}</p>
+      </div>
+    ))}
+    <p><a href="/builds/">All builds →</a></p>
+  </section>
+</Base>
