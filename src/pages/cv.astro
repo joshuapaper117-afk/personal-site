@@ -1,14 +1,80 @@
 ---
 import Base from '../layouts/Base.astro';
 ---
-<Base title="CV · Josh Paper">
+<Base title="CV · Josh Paper" description="CV: technical delivery and project management, AWS Certified Cloud Practitioner.">
   <h1>CV</h1>
-  <p><a href="/cv.pdf">Download PDF</a></p>
-  <!-- Paste your CV here as HTML, or just keep the PDF link and drop cv.pdf into /public. -->
+  <p class="meta">London, United Kingdom · British Citizen</p>
+
+  <h2>Summary</h2>
+  <p>
+    Technical delivery and project management professional with three years at The Access Group, the largest
+    UK-headquartered software provider. Run around 25 concurrent projects drawn from a 70+ client portfolio on
+    retainer, including Bandai Namco, F1 Arcade, Wingstop, Five Guys and Itsu, owning delivery end to end from
+    discovery and scoping through integration build to post-launch adoption against contracted hours and SLA
+    commitments. Scoped a loyalty integration now live across 16 brands and 56 venues and built an AI-assisted
+    intake system that cut project scoping from five working days to a few hours. AWS Certified Cloud Practitioner.
+  </p>
+
   <h2>Experience</h2>
-  <p>TODO</p>
-  <h2>Education</h2>
-  <p>TODO</p>
+
+  <h3>Acteol, an Access Company</h3>
+  <p class="meta">Hospitality CRM platform within The Access Group.</p>
+
+  <h4>Junior Project Delivery Manager <span class="meta">· April 2025 to present</span></h4>
+  <ul>
+    <li>Own delivery end to end on around 25 concurrent projects, from single integrations to module builds, drawn from a 70+ client portfolio. Deliver against contracted hours and SLA commitments, managing client and internal escalations.</li>
+    <li><strong>DRG loyalty integration (Pepper):</strong> Scoped the CRM-to-Pepper integration for DRG across 16 brands and 56 venues, defining how transactions flow into the loyalty engine and how points accrue, tier and redeem. Owned field mapping and pre-go-live validation with Product and Engineering; live and operating across all 56 venues.</li>
+    <li><strong>Asana rollout, 60 users:</strong> Co-led company-wide implementation, designing AI task automation, workflow rules, and client request forms. Overdue task rate fell from 25% to 11%; scoping cut from five working days to three.</li>
+    <li><strong>AI-assisted project intake:</strong> Built a client-facing intake form that benchmarks incoming briefs against several hundred historical projects, deriving what a complete brief looks like by category and flagging gaps back to the client until the submission is usable. Accepted briefs auto-create an Asana task via integration. Scoping cut further, from three working days to a few hours. After launch, demoed to 150+ stakeholders.</li>
+    <li>Act as primary technical consultant for key CRM modules (Dashboards, Sales Portal and Feedback &amp; Enquiries), running kick-off, discovery and feasibility sessions, translating requirements into build specifications and sequencing delivery against Engineering sprint cycles.</li>
+    <li>Draft Statements of Work covering scope, timelines, risk and resourcing, supported by UI mock-ups and workflow designs that align stakeholders pre-contract, then manage change control against contracted scope post-signature.</li>
+  </ul>
+
+  <h4>Project Delivery Executive <span class="meta">· April 2024 to April 2025</span></h4>
+  <ul>
+    <li><strong>Client feedback portal:</strong> Re-architected the portal to auto-close resolved tickets and redirect to FAQs, deflecting 40% of inbound volume and removing 5 to 6 days of manual triage per month from the support team.</li>
+    <li><strong>Automated user creation:</strong> Replaced a manual HR and client-onboarding process with an automated provisioning system, cutting half a day of admin per week and shortening client go-live setup.</li>
+    <li>Designed and delivered structured onboarding and training programmes, taking clients from launch through to platform maturity.</li>
+    <li>Presented at quarterly business reviews, turning performance trends into recommendations that shaped client roadmaps and internal feature prioritisation.</li>
+  </ul>
+
+  <h4>Associate Consultant <span class="meta">· October 2023 to April 2024</span></h4>
+  <ul>
+    <li>Owned a portfolio of CRM clients, running consultative account assessments informed by competitor and consumer behaviour analysis.</li>
+    <li>Sustained a review cadence that surfaced needs early, reduced support dependency, and opened up-sell conversations.</li>
+  </ul>
+
+  <h3>Royal Academy of Dance</h3>
+  <p class="meta">International dance education charity and awarding organisation, 13,000+ members worldwide.</p>
+  <h4>Finance Assistant <span class="meta">· July 2022 to October 2023</span></h4>
+  <ul>
+    <li>Streamlined multi-currency reconciliation. Redesigned how transactions were categorised, allocating transactions to the correct accounts on first pass, cutting the monthly reconciliation cycle from five days to two.</li>
+    <li>Processed transactions and reconciliations across 3 currencies and 80 countries, working between the finance system and the operational data feeding it.</li>
+  </ul>
+
+  <h2>Certifications</h2>
+  <ul>
+    <li>AWS Certified Cloud Practitioner · July 2026</li>
+    <li>AWS Solutions Architect Associate · in progress</li>
+  </ul>
+
+  <h2>Projects</h2>
+  <ul>
+    <li><a href="/builds/second-look/">Second Look</a>: iOS app for pausing impulse purchases (AWS). Capacitor and Swift front end; Cognito, API Gateway, Lambda and DynamoDB back end with server-side per-user data isolation.</li>
+    <li>Howzit: serverless web app for contact management (AWS). Cognito, API Gateway, Lambda and DynamoDB with server-side per-user data isolation and least-privilege IAM.</li>
+  </ul>
+
   <h2>Skills</h2>
-  <p>TODO</p>
+  <ul>
+    <li><strong>Delivery and consulting:</strong> Hybrid delivery (waterfall client delivery against Agile engineering cycles), discovery and feasibility sessions, solution scoping, Statements of Work, change control, risk and issue management, budget and resource planning, API integration scoping and field mapping, onboarding and training design, QBRs.</li>
+    <li><strong>Data and reporting:</strong> Advanced Excel (pivot tables, XLOOKUP, data modelling) and Power BI; Python for workflow automation and analysis (Pandas, NumPy, Plotly).</li>
+    <li><strong>Platforms:</strong> SaaS CRM systems, Asana (AI task automation, workflow design).</li>
+    <li><strong>Cloud (AWS):</strong> Lambda, API Gateway, DynamoDB, Cognito, S3, CloudFront, IAM.</li>
+  </ul>
+
+  <h2>Education</h2>
+  <ul>
+    <li><strong>Bachelor of Social Science (Hons), Economics</strong> · 2021. Rhodes University, South Africa. First Class Honours; Dean's List; Academic Half Colours.</li>
+    <li><strong>Bachelor of Social Science, Economics and Industrial Psychology</strong> · 2016 to 2020. Rhodes University, South Africa. First Class.</li>
+  </ul>
 </Base>
