@@ -23,6 +23,6 @@ const builds = (await getCollection('builds', (b) => !b.data.draft))
         <p>{b.data.summary}</p>
       </div>
     ))}
-    <p><a href="/builds/">All builds →</a></p>
+    <p><a href="/builds/">All builds →</a> · <a href="/ideas/">Ideas I'm floating →</a></p>
   </section>
 </Base>

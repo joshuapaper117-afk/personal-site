@@ -3,7 +3,9 @@
 Astro static site → S3 + CloudFront (CDK in `infra/`) → deployed by GitHub Actions on push to `main`.
 
 ## Add a build
-Create `src/content/builds/<name>.md` with frontmatter (title, summary, date, status, tags, repo). Push to `main`.
+Floating an idea: add `src/content/ideas/<name>.md` (title, summary, stage). When it becomes real, move it to builds.
+
+Add a build: create `src/content/builds/<name>.md` with frontmatter (title, summary, date, status, tags, repo). Push to `main`.
 
 ## One-time setup
 1. `cd infra && npx cdk bootstrap && npx cdk deploy` (repo name is set in `infra/cdk.json``
