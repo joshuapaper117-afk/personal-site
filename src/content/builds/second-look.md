@@ -2,9 +2,8 @@
 title: Second Look
 summary: An iOS app for pausing impulse purchases, built on AWS.
 date: 2026-10-17
-status: shipped
+status: in-progress
 tags: [ios, aws, capacitor, swift, serverless]
-repo: https://github.com/YOUR-USERNAME/second-look
 ---
 
 ## What it is

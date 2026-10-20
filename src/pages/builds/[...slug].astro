@@ -23,7 +23,6 @@ const d = entry.data;
           <dt>Status</dt>
           <dd><span class="chip" data-status={d.status}><i></i>{statusLabel[d.status]}</span></dd>
           {d.tags.length > 0 && (<><dt>Stack</dt><dd class="tags">{d.tags.map((t) => <span class="tag">{t}</span>)}</dd></>)}
-          {d.repo && (<><dt>Source</dt><dd><a href={d.repo}>Repository ↗</a></dd></>)}
         </dl>
       </aside>
       <div class="prose"><Content /></div>

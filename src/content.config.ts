@@ -9,7 +9,6 @@ const builds = defineCollection({
     date: z.coerce.date(),
     status: z.enum(['planned', 'in-progress', 'shipped']).default('shipped'),
     tags: z.array(z.string()).default([]),
-    repo: z.string().url().optional(),
     draft: z.boolean().default(false),
   }),
 });
