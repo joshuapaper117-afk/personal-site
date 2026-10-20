@@ -1,23 +1,31 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { pad } from '../lib/builds';
 import { getCollection } from 'astro:content';
+
 const ideas = (await getCollection('ideas')).sort((a, b) => a.data.title.localeCompare(b.data.title));
 const label = { idea: 'Just an idea', exploring: 'Exploring' };
 ---
 <Base title="Future builds · Josh Paper">
-  <h1>Future builds</h1>
-  <p>
+  <PageHead kicker={['Unconfirmed', `${pad(ideas.length, 2)} ideas`]} title="Future builds" block={false} />
+  <p class="lede">
     Ideas I'm floating around. Nothing here is confirmed: some may become real
     builds, some will quietly disappear. When one gets going it moves to
     <a href="/builds/">Builds</a>.
   </p>
   {ideas.length === 0 && <p class="meta">Nothing on the list right now.</p>}
-  {ideas.map((i) => (
-    <div class="card">
-      <h3>{i.data.title}</h3>
-      <div class="meta">{label[i.data.stage]}</div>
-      <p>{i.data.summary}</p>
-      {i.data.tags.map((t) => <span class="tag">{t}</span>)}
-    </div>
-  ))}
+  <div class="tiles">
+    {ideas.map((i, idx) => (
+      <div class="tile ghost">
+        <div class="tile-top"><span class="mono">Idea ?{pad(idx + 1, 2)}</span><span class="chip ghost">{label[i.data.stage]}</span></div>
+        <div class="tile-num" aria-hidden="true">?</div>
+        <div class="tile-body">
+          <h3>{i.data.title}</h3>
+          <p>{i.data.summary}</p>
+          <div class="tags">{i.data.tags.map((t) => <span class="tag">{t}</span>)}</div>
+        </div>
+      </div>
+    ))}
+  </div>
 </Base>

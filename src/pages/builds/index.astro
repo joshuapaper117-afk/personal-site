@@ -1,17 +1,22 @@
 ---
 import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import BuildTile from '../../components/BuildTile.astro';
+import { getBuilds, pad } from '../../lib/builds';
 import { getCollection } from 'astro:content';
-const builds = (await getCollection('builds', (b) => !b.data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const builds = await getBuilds();
+const ideas = await getCollection('ideas');
 ---
 <Base title="Builds · Josh Paper">
-  <h1>Builds</h1>
-  {builds.map((b) => (
-    <div class="card">
-      <h3><a href={`/builds/${b.id}/`}>{b.data.title}</a></h3>
-      <div class="meta">{b.data.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short' })} · {b.data.status}</div>
-      <p>{b.data.summary}</p>
-      {b.data.tags.map((t) => <span class="tag">{t}</span>)}
-    </div>
-  ))}
+  <PageHead kicker={['Index', `${pad(builds.length, 2)} builds`, 'Newest first']} title="Builds" />
+  <p class="lede">Everything I've built and written up, with what worked, what didn't, and what I'd change.</p>
+  <div class="tiles">
+    {builds.map((b) => <BuildTile build={b} />)}
+    <a class="tile ghost" href="/ideas/">
+      <div class="tile-top"><span class="mono">Next</span><span class="chip ghost">{ideas.length} unconfirmed</span></div>
+      <div class="tile-num" aria-hidden="true">{pad(builds.length + 1, 2)}</div>
+      <div class="tile-body"><h3>What's next?</h3><p>Ideas I'm floating around. Nothing here is confirmed.</p></div>
+    </a>
+  </div>
 </Base>

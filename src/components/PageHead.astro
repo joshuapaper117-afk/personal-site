@@ -1,0 +1,11 @@
+---
+interface Props { kicker: string[]; title: string; block?: boolean }
+const { kicker, title, block = true } = Astro.props;
+---
+<section class="pagehead">
+  <div class="kicker">{kicker.map((k) => <span>{k}</span>)}</div>
+  <div class="title-wrap">
+    <h1>{title}</h1>
+    {block && <div class="orange-block" aria-hidden="true"></div>}
+  </div>
+</section>

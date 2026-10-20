@@ -1,22 +1,33 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getCollection, render } from 'astro:content';
+import PageHead from '../../components/PageHead.astro';
+import { getBuilds, pad, statusLabel } from '../../lib/builds';
+import { render } from 'astro:content';
 
 export async function getStaticPaths() {
-  const builds = await getCollection('builds', (b) => !b.data.draft);
+  const builds = await getBuilds();
   return builds.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
 }
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+const d = entry.data;
 ---
-<Base title={`${entry.data.title} · Josh Paper`} description={entry.data.summary}>
+<Base title={`${d.title} · Josh Paper`} description={d.summary}>
   <article>
-    <h1>{entry.data.title}</h1>
-    <div class="meta">
-      {entry.data.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })} · {entry.data.status}
-      {entry.data.repo && <> · <a href={entry.data.repo}>Source</a></>}
+    <PageHead kicker={[`Build N°${pad(entry.n)}`, statusLabel[d.status]]} title={d.title} />
+    <div class="post">
+      <aside class="facts">
+        <dl>
+          <dt>Date</dt>
+          <dd>{d.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}</dd>
+          <dt>Status</dt>
+          <dd><span class="chip" data-status={d.status}><i></i>{statusLabel[d.status]}</span></dd>
+          {d.tags.length > 0 && (<><dt>Stack</dt><dd class="tags">{d.tags.map((t) => <span class="tag">{t}</span>)}</dd></>)}
+          {d.repo && (<><dt>Source</dt><dd><a href={d.repo}>Repository ↗</a></dd></>)}
+        </dl>
+      </aside>
+      <div class="prose"><Content /></div>
     </div>
-    <Content />
+    <a class="backlink" href="/builds/">← All builds</a>
   </article>
-  <p><a href="/builds/">← All builds</a></p>
 </Base>

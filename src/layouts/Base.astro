@@ -1,7 +1,24 @@
 ---
+import '@fontsource-variable/inter-tight';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/700.css';
 import '../styles/global.css';
+
 interface Props { title: string; description?: string }
 const { title, description = 'Personal site: about me, my builds, and my CV.' } = Astro.props;
+
+const path = Astro.url.pathname;
+const nav = [
+  ['about', '/#about', path === '/'],
+  ['builds', '/builds/', path.startsWith('/builds')],
+  ['ideas', '/ideas/', path.startsWith('/ideas')],
+  ['cv', '/cv/', path.startsWith('/cv')],
+] as const;
+
+const now = new Date();
+const built = [now.getDate(), now.getMonth() + 1, now.getFullYear() % 100]
+  .map((n) => String(n).padStart(2, '0'))
+  .join('.');
 ---
 <!doctype html>
 <html lang="en">
@@ -9,19 +26,29 @@ const { title, description = 'Personal site: about me, my builds, and my CV.' } 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#e6e6e3" />
     <title>{title}</title>
   </head>
-  <body>
-    <header>
-      <a class="brand" href="/">Josh Paper</a>
-      <nav>
-        <a href="/#about">About</a>
-        <a href="/builds/">Builds</a>
-        <a href="/ideas/">Future builds</a>
-        <a href="/cv/">CV</a>
+  <body id="top">
+    <header class="top wrap">
+      <a class="mark" href="/">josh—paper</a>
+      <nav aria-label="Main">
+        {nav.map(([label, href, active]) => (
+          <a href={href} aria-current={active ? 'page' : undefined}>{label}</a>
+        ))}
       </nav>
+      <span class="lcd" title="Date this site was last built"><span>BUILT</span><b>{built}</b></span>
     </header>
-    <main><slot /></main>
-    <footer>Built with Astro, hosted on AWS.</footer>
+
+    <main class="wrap"><slot /></main>
+
+    <footer class="wrap">
+      <div class="bar"></div>
+      <div class="foot-grid">
+        <span class="mark">josh—paper</span>
+        <span>Built with Astro, hosted on AWS.</span>
+        <a href="#top" class="mono">↑ top</a>
+      </div>
+    </footer>
   </body>
 </html>
