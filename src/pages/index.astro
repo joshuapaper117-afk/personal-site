@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
+import headshot from '../assets/headshot.jpg';
 import BuildTile from '../components/BuildTile.astro';
 import { getBuilds, pad } from '../lib/builds';
 import { getCollection } from 'astro:content';
@@ -11,9 +13,25 @@ const latest = builds.slice(0, 4);
 <Base title="Josh Paper">
   <section class="hero" id="about-top">
     <div class="kicker"><span>Personal site</span><span>London, UK</span><span>Builds N°001–{pad(builds.length)}</span></div>
-    <div class="title-wrap">
-      <h1>Josh<br />Paper</h1>
-      <div class="orange-block" aria-hidden="true"></div>
+    <div class="hero-grid">
+      <div class="title-wrap">
+        <h1>Josh<br />Paper</h1>
+        <div class="orange-block" aria-hidden="true"></div>
+      </div>
+      <figure class="portrait">
+        <div class="portrait-img">
+          <Image
+            src={headshot}
+            alt="Headshot of Josh"
+            widths={[480, 800, 1200]}
+            sizes="(min-width: 900px) 40vw, 100vw"
+            format="webp"
+            quality={82}
+            loading="eager"
+          />
+        </div>
+        <figcaption><span class="label">Portrait</span><span>Josh Paper — Project manager</span></figcaption>
+      </figure>
     </div>
     <div class="hero-meta">
       <p><small>Now</small>Project manager. Tinkerer. Building things and writing them up.</p>
