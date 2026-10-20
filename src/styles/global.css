@@ -192,6 +192,15 @@ footer { padding-block: 4rem 1.5rem; }
 .cv p { margin: 0 0 .5rem; }
 .meta { color: var(--muted); font-size: .9rem; }
 
+/* ---------- justified body text ---------- */
+/* Hyphenation keeps justified lines from opening up big gaps in narrow columns. */
+.about .copy p, .lede, .prose p, .prose li, .cv p, .cv li, .tile p, .hero-meta p, .facts dd {
+  text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;
+}
+
+/* Large text: no hyphen breaks, they look awkward at that size. */
+.about .copy p, .lede { hyphens: manual; -webkit-hyphens: manual; }
+
 /* ---------- mobile ---------- */
 @media (max-width: 760px) {
   .top { grid-template-columns: 1fr auto; }
