@@ -1,8 +1,9 @@
 ---
-import '@fontsource-variable/inter-tight';
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/700.css';
 import '../styles/global.css';
+// Preloaded so the fonts arrive with the page instead of swapping in after first paint.
+import interUrl from '@fontsource-variable/inter-tight/files/inter-tight-latin-wght-normal.woff2?url';
+import mono400Url from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url';
+import mono700Url from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff2?url';
 
 interface Props { title: string; description?: string }
 const { title, description = 'Personal site: about me, my builds, and my CV.' } = Astro.props;
@@ -27,6 +28,9 @@ const built = [now.getDate(), now.getMonth() + 1, now.getFullYear() % 100]
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#e6e6e3" />
+    {[interUrl, mono400Url, mono700Url].map((href) => (
+      <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />
+    ))}
     <title>{title}</title>
   </head>
   <body id="top">
