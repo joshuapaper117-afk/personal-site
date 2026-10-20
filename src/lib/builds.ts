@@ -18,5 +18,5 @@ export async function getBuilds(): Promise<Build[]> {
   return all.map((e, i) => ({ ...e, n: i + 1 })).reverse();
 }
 
-export const tones = ['orange', 'ink', 'paper'] as const;
+export const tones = ['accent', 'ink', 'paper'] as const;
 export const toneFor = (n: number) => tones[(n - 1) % tones.length];
