@@ -3,8 +3,6 @@
 Astro static site → S3 + CloudFront (CDK in `infra/`) → deployed by GitHub Actions on push to `main`.
 
 ## Add a build
-Floating an idea: add `src/content/ideas/<name>.md` (title, summary, stage). When it becomes real, move it to builds.
-
 Add a build: create `src/content/builds/<name>.md` with frontmatter (title, summary, date, status, tags). Push to `main`.
 
 ## One-time setup

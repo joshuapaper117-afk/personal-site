@@ -3,20 +3,13 @@ import Base from '../../layouts/Base.astro';
 import PageHead from '../../components/PageHead.astro';
 import BuildTile from '../../components/BuildTile.astro';
 import { getBuilds, pad } from '../../lib/builds';
-import { getCollection } from 'astro:content';
 
 const builds = await getBuilds();
-const ideas = await getCollection('ideas');
 ---
 <Base title="Builds · Josh Paper">
   <PageHead kicker={['Index', `${pad(builds.length, 2)} builds`, 'Newest first']} title="Builds" />
   <p class="lede">Everything I've built and written up, with what worked, what didn't, and what I'd change.</p>
   <div class="tiles">
     {builds.map((b) => <BuildTile build={b} />)}
-    <a class="tile ghost" href="/ideas/">
-      <div class="tile-top"><span class="mono">Next</span><span class="chip ghost">{ideas.length} unconfirmed</span></div>
-      <div class="tile-num" aria-hidden="true">{pad(builds.length + 1, 2)}</div>
-      <div class="tile-body"><h3>What's next?</h3><p>Ideas I'm floating around. Nothing here is confirmed.</p></div>
-    </a>
   </div>
 </Base>

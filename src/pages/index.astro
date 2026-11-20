@@ -2,10 +2,8 @@
 import Base from '../layouts/Base.astro';
 import BuildTile from '../components/BuildTile.astro';
 import { getBuilds, pad } from '../lib/builds';
-import { getCollection } from 'astro:content';
 
 const builds = await getBuilds();
-const ideas = await getCollection('ideas');
 const latest = builds.slice(0, 4);
 ---
 <Base title="Josh Paper">
@@ -45,12 +43,7 @@ const latest = builds.slice(0, 4);
     <div class="sec-head"><h2>Builds</h2><span class="mono">[{pad(builds.length, 2)}]</span></div>
     <div class="tiles">
       {latest.map((b) => <BuildTile build={b} />)}
-      <a class="tile ghost" href="/ideas/">
-        <div class="tile-top"><span class="mono">Next</span><span class="chip ghost">{ideas.length} unconfirmed</span></div>
-        <div class="tile-num" aria-hidden="true">{pad(builds.length + 1, 2)}</div>
-        <div class="tile-body"><h3>What's next?</h3><p>Ideas I'm floating around. Nothing here is confirmed.</p></div>
-      </a>
     </div>
-    <div class="more"><a href="/builds/">All builds →</a><a href="/ideas/">Future builds →</a></div>
+    <div class="more"><a href="/builds/">All builds →</a></div>
   </section>
 </Base>

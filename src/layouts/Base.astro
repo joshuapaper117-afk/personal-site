@@ -12,7 +12,6 @@ const path = Astro.url.pathname;
 const nav = [
   ['about', '/#about', path === '/'],
   ['builds', '/builds/', path.startsWith('/builds')],
-  ['ideas', '/ideas/', path.startsWith('/ideas')],
   ['cv', '/cv/', path.startsWith('/cv')],
 ] as const;
 

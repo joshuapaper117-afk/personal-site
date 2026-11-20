@@ -13,15 +13,4 @@ const builds = defineCollection({
   }),
 });
 
-const ideas = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/ideas' }),
-  schema: z.object({
-    title: z.string(),
-    summary: z.string(),
-    // idea = just floating it, exploring = actively researching it
-    stage: z.enum(['idea', 'exploring']).default('idea'),
-    tags: z.array(z.string()).default([]),
-  }),
-});
-
-export const collections = { builds, ideas };
+export const collections = { builds };
