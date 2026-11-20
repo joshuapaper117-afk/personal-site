@@ -4,6 +4,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 
 interface SiteStackProps extends cdk.StackProps {
   githubRepo: string; // "owner/repo"
@@ -34,12 +35,38 @@ function handler(event) {
 }`),
     });
 
+    // Admin API: a Lambda that checks the password and commits build edits to GitHub.
+    // Secrets live in SSM (SecureString), created out-of-band: see README "Admin".
+    const paramPrefix = '/personal-site/admin';
+    const adminFn = new lambda.Function(this, 'AdminFn', {
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: 'admin.handler',
+      code: lambda.Code.fromAsset('lambda'),
+      timeout: cdk.Duration.seconds(20),
+      memorySize: 256,
+      environment: { GITHUB_REPO: props.githubRepo, GITHUB_BRANCH: 'main', PARAM_PREFIX: paramPrefix },
+    });
+    adminFn.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['ssm:GetParameters'],
+      resources: [`arn:aws:ssm:${this.region}:${this.account}:parameter${paramPrefix}/*`],
+    }));
+    const adminUrl = adminFn.addFunctionUrl({ authType: lambda.FunctionUrlAuthType.NONE });
+
     const dist = new cloudfront.Distribution(this, 'Dist', {
       defaultRootObject: 'index.html',
       defaultBehavior: {
         origin: origins.S3BucketOrigin.withOriginAccessControl(bucket),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         functionAssociations: [{ function: rewrite, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST }],
+      },
+      additionalBehaviors: {
+        '/api/*': {
+          origin: new origins.FunctionUrlOrigin(adminUrl),
+          viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.HTTPS_ONLY,
+          allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+          cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+          originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+        },
       },
       errorResponses: [
         { httpStatus: 403, responseHttpStatus: 404, responsePagePath: '/404.html' },

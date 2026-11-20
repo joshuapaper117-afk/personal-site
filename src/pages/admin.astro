@@ -1,0 +1,169 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+---
+<Base title="Admin" noindex>
+  <PageHead kicker={['Private']} title="Admin" block={false} />
+
+  <section id="login" class="adm">
+    <form id="loginForm">
+      <label>Password <input id="pw" type="password" autocomplete="current-password" required /></label>
+      <button type="submit">Sign in</button>
+      <p class="msg" id="loginMsg" role="status"></p>
+    </form>
+  </section>
+
+  <section id="app" class="adm" hidden>
+    <div class="bar-row">
+      <button id="newBtn" type="button">New build</button>
+      <button id="outBtn" type="button" class="plain">Sign out</button>
+    </div>
+    <ul id="list" class="list"></ul>
+
+    <form id="editor" hidden>
+      <h2 id="edTitle">Build</h2>
+      <label>Title <input name="title" required /></label>
+      <label>Slug (URL name, can't change later) <input name="slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" required /></label>
+      <label>Summary <input name="summary" required /></label>
+      <div class="two">
+        <label>Date <input name="date" type="date" required /></label>
+        <label>Status
+          <select name="status"><option>planned</option><option>in-progress</option><option>shipped</option></select>
+        </label>
+      </div>
+      <label>Tags (comma separated) <input name="tags" /></label>
+      <label class="check"><input name="draft" type="checkbox" /> Draft (hidden from the site)</label>
+      <label>Body (markdown) <textarea name="body" rows="18"></textarea></label>
+      <div class="bar-row">
+        <button type="submit">Save</button>
+        <button id="cancelBtn" type="button" class="plain">Cancel</button>
+        <button id="delBtn" type="button" class="danger" hidden>Delete</button>
+      </div>
+      <p class="msg" id="edMsg" role="status"></p>
+    </form>
+  </section>
+</Base>
+
+<style>
+  .adm { max-width: 46rem; padding-block: 1rem 3rem; }
+  .adm[hidden], #editor[hidden], [hidden] { display: none; }
+  form { display: grid; gap: 1rem; }
+  label { display: grid; gap: .3rem; font-weight: 600; font-size: .9rem; }
+  label.check { display: flex; align-items: center; gap: .5rem; }
+  input:not([type=checkbox]), select, textarea {
+    font: inherit; font-weight: 400; padding: .6rem .7rem; border: 2px solid var(--ink); background: var(--panel); color: var(--ink); border-radius: 0; width: 100%;
+  }
+  textarea { font-family: var(--mono); font-size: .85rem; line-height: 1.5; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  button { font: inherit; font-weight: 700; padding: .6rem 1.1rem; border: 2px solid var(--ink); background: var(--ink); color: var(--bg); cursor: pointer; }
+  button.plain { background: transparent; color: var(--ink); }
+  button.danger { background: transparent; color: #b00020; border-color: #b00020; margin-left: auto; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .bar-row { display: flex; gap: .75rem; margin-bottom: 1rem; }
+  form .bar-row { margin-bottom: 0; }
+  .list { list-style: none; padding: 0; margin: 0 0 2rem; display: grid; gap: .5rem; }
+  .list button { width: 100%; text-align: left; background: var(--panel); color: var(--ink); display: flex; justify-content: space-between; gap: 1rem; }
+  .list small { font-family: var(--mono); font-weight: 400; color: var(--muted); }
+  .msg { margin: 0; min-height: 1.5em; font-size: .9rem; }
+  .msg.err { color: #b00020; }
+</style>
+
+<script>
+  type B = { slug: string; sha: string; content: string };
+  const $ = (id: string) => document.getElementById(id)!;
+  const KEY = 'admin-token';
+  let token = ''; try { token = sessionStorage.getItem(KEY) || ''; } catch {}
+  let builds: B[] = [];
+  let current: B | null = null; // null = new build
+
+  const say = (el: string, text: string, err = false) => { const m = $(el); m.textContent = text; m.className = 'msg' + (err ? ' err' : ''); };
+
+  async function api(method: string, body?: unknown) {
+    const res = await fetch('/api/' + (method === 'LOGIN' ? 'login' : 'builds'), {
+      method: method === 'LOGIN' ? 'POST' : method,
+      headers: { 'content-type': 'application/json', 'x-admin-token': token },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401 && method !== 'LOGIN') { signOut(); throw new Error('Session expired: sign in again'); }
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    return data;
+  }
+
+  // --- tiny frontmatter reader/writer matching the site's build schema ---
+  const unq = (v: string) => { v = v.trim(); if (v.startsWith('"')) { try { return JSON.parse(v); } catch {} } return v.replace(/^'(.*)'$/, '$1'); };
+  function parse(content: string) {
+    const m = content.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/)!;
+    const f: Record<string, string> = {};
+    for (const line of m[1].split('\n')) { const i = line.indexOf(':'); if (i > 0) f[line.slice(0, i).trim()] = line.slice(i + 1).trim(); }
+    const tags = (f.tags || '').replace(/^\[|\]$/g, '').split(',').map((t) => unq(t)).filter(Boolean);
+    return { title: unq(f.title || ''), summary: unq(f.summary || ''), date: unq(f.date || ''), status: unq(f.status || 'shipped'), tags, draft: f.draft === 'true', body: m[2].replace(/^\n/, '') };
+  }
+  function compose(v: { title: string; summary: string; date: string; status: string; tags: string[]; draft: boolean; body: string }) {
+    return ['---', `title: ${JSON.stringify(v.title)}`, `summary: ${JSON.stringify(v.summary)}`, `date: ${v.date}`, `status: ${v.status}`,
+      `tags: [${v.tags.map((t) => JSON.stringify(t)).join(', ')}]`, ...(v.draft ? ['draft: true'] : []), '---', '', v.body.trim(), ''].join('\n');
+  }
+
+  function renderList() {
+    const ul = $('list'); ul.innerHTML = '';
+    for (const b of [...builds].sort((a, c) => parse(c.content).date.localeCompare(parse(a.content).date))) {
+      const p = parse(b.content);
+      const li = document.createElement('li'); const btn = document.createElement('button'); btn.type = 'button';
+      btn.innerHTML = '<span></span><small></small>';
+      btn.firstElementChild!.textContent = p.title; btn.lastElementChild!.textContent = p.draft ? 'draft' : p.status;
+      btn.onclick = () => edit(b); li.append(btn); ul.append(li);
+    }
+  }
+  async function load() {
+    const d = await api('GET'); builds = d.builds; renderList();
+  }
+
+  const form = $('editor') as HTMLFormElement;
+  const f = (n: string) => form.elements.namedItem(n) as HTMLInputElement;
+  function edit(b: B | null) {
+    current = b; say('edMsg', '');
+    const p = b ? parse(b.content) : { title: '', summary: '', date: new Date().toISOString().slice(0, 10), status: 'planned', tags: [], draft: false, body: '' };
+    f('title').value = p.title; f('summary').value = p.summary; f('date').value = p.date; f('status').value = p.status;
+    f('tags').value = p.tags.join(', '); f('draft').checked = p.draft; f('body').value = p.body;
+    f('slug').value = b ? b.slug : ''; f('slug').readOnly = !!b;
+    $('edTitle').textContent = b ? 'Edit build' : 'New build'; $('delBtn').hidden = !b;
+    form.hidden = false; form.scrollIntoView({ behavior: 'smooth' });
+  }
+  const busy = (on: boolean) => document.querySelectorAll('button').forEach((x) => ((x as HTMLButtonElement).disabled = on));
+
+  function show(signedIn: boolean) { $('login').hidden = signedIn; $('app').hidden = !signedIn; }
+  function signOut() { token = ''; try { sessionStorage.removeItem(KEY); } catch {} form.hidden = true; show(false); }
+
+  ($('loginForm') as HTMLFormElement).onsubmit = async (e) => {
+    e.preventDefault(); busy(true); say('loginMsg', 'Signing in…');
+    try {
+      const d = await api('LOGIN', { password: (f2('pw')).value });
+      token = d.token; try { sessionStorage.setItem(KEY, token); } catch {}
+      f2('pw').value = ''; say('loginMsg', ''); show(true); await load();
+    } catch (err) { say('loginMsg', (err as Error).message, true); } finally { busy(false); }
+  };
+  const f2 = (id: string) => $(id) as HTMLInputElement;
+
+  $('newBtn').onclick = () => edit(null);
+  $('cancelBtn').onclick = () => { form.hidden = true; };
+  $('outBtn').onclick = signOut;
+
+  form.onsubmit = async (e) => {
+    e.preventDefault(); busy(true); say('edMsg', 'Saving…');
+    try {
+      const content = compose({ title: f('title').value.trim(), summary: f('summary').value.trim(), date: f('date').value, status: f('status').value,
+        tags: f('tags').value.split(',').map((t) => t.trim()).filter(Boolean), draft: f('draft').checked, body: f('body').value });
+      await api('PUT', { slug: f('slug').value, content, sha: current?.sha });
+      await load(); form.hidden = true; window.scrollTo({ top: 0, behavior: 'smooth' });
+      say('edMsg', ''); alert('Saved. The site rebuilds in about 2 minutes.');
+    } catch (err) { say('edMsg', (err as Error).message, true); } finally { busy(false); }
+  };
+  $('delBtn').onclick = async () => {
+    if (!current || !confirm(`Delete "${current.slug}"? It stays in GitHub history but leaves the site.`)) return;
+    busy(true);
+    try { await api('DELETE', { slug: current.slug, sha: current.sha }); await load(); form.hidden = true; alert('Deleted. The site rebuilds in about 2 minutes.'); }
+    catch (err) { say('edMsg', (err as Error).message, true); } finally { busy(false); }
+  };
+
+  if (token) { show(true); load().catch(() => signOut()); }
+</script>
